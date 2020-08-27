@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pylab as plt
 
 s60DataSet = "data/musicReport-60.csv"
 s70DataSet = "data/musicReport-70.csv"
