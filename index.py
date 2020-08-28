@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pylab as plt
+import re
+
 
 s60DataSetClear = 'data/clearData/musicReport-ClearData-60.csv'
 s60DataSetStemming = 'data/stemmingData/musicReport-StemmingData-60.csv'
@@ -26,6 +28,35 @@ def generateGraphOfNumberOfSongsPerDecade(decades, qtyPerDecade):
     plt.savefig('output/graphNumberOfSongPerDecade.png', transparent = True)
 
 
+def generateBoxPlotQtyWordsClearData(decades, listPathClearData, qtyPerDecade):
+    #incluir gráfico do tipo boxplot com a quantidade de palavras por música (eixo y) por década (eixo x) da BASE LIMPA.
+
+    qtyWords = []
+    decade = []
+
+    i = 0
+    for path in listPathClearData:
+        df = pd.read_csv(path)
+        totalWords = 0
+        texts = list(df['Text'])
+        for text in texts:
+            words = text.split(",")
+            decade.append(decades[i])
+            qtyWords.append(len(words))
+        i = i + 1
+    
+    data = {'decade': decade, 'len': qtyWords}
+
+    dfData = pd.DataFrame(data, columns=['decade', 'len'])
+    dfData.boxplot(column='len', by='decade', showfliers=False)
+    plt.show()
+
+
+
+    
+
+
+
 def main():
 
     decades = ['60', '70', '80', '90', '2000', '2010']
@@ -40,7 +71,10 @@ def main():
         length = df.size
         qtyPerDecade.append(length)
 
-    generateGraphOfNumberOfSongsPerDecade(decades, qtyPerDecade)
+    # generateGraphOfNumberOfSongsPerDecade(decades, qtyPerDecade)
+
+
+    generateBoxPlotQtyWordsClearData(decades, listPathClearData, qtyPerDecade)
 
 
 if __name__ == '__main__':
