@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pylab as plt
 import re
-
+import seaborn as sns
 
 s60DataSetClear = 'data/clearData/musicReport-ClearData-60.csv'
 s60DataSetStemming = 'data/stemmingData/musicReport-StemmingData-60.csv'
@@ -48,8 +48,12 @@ def generateBoxPlotQtyWordsClearData(decades, listPathClearData, qtyPerDecade):
     data = {'decade': decade, 'len': qtyWords}
 
     dfData = pd.DataFrame(data, columns=['decade', 'len'])
+    print(dfData)
     dfData.boxplot(column='len', by='decade', showfliers=False)
     plt.show()
+
+
+
 
 
 
