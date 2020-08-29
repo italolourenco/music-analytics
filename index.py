@@ -21,9 +21,22 @@ s2000DataSetStemming = 'data/stemmingData/musicReport-StemmingData-2000.csv'
 s2010DataSetClear = 'data/clearData/musicReport-ClearData-2010.csv'
 s2010DataSetStemming = 'data/stemmingData/musicReport-StemmingData-2010.csv'
 
+decades = ['60', '70', '80', '90', '2000', '2010']
+
+listPathClearData = [
+    s60DataSetClear, s70DataSetClear, 
+    s80DataSetClear, s90DataSetClear, 
+    s2000DataSetClear, s2010DataSetClear
+]
+
+listPathStemmingData = [
+    s60DataSetStemming, s70DataSetStemming, 
+    s80DataSetStemming, s90DataSetStemming, 
+    s2000DataSetStemming, s2010DataSetStemming
+]
 
 def readCSV(path):
-    return pd.read_csv(path, sep = ';')
+    return pd.read_csv(path)
 
 
 def generateGraphOfNumberOfSongsPerDecade(decades, qtyPerDecade):
@@ -81,9 +94,8 @@ def generateBoxPlotQtyWordsStemmingData(decades, listPathStemmingData, qtyPerDec
     plt.show()
 
 
-def processingDF(path):
+def processingCSV(path):
     df = pd.read_csv(path, sep = ';')
-
 
 
 
@@ -91,17 +103,39 @@ def processingDF(path):
 
 def main():
 
-    decades = ['60', '70', '80', '90', '2000', '2010']
-    qtyPerDecade = []
+    baseStemming = {}
 
-    listPathClearData = [s60DataSetClear, s70DataSetClear, s80DataSetClear, s90DataSetClear, s2000DataSetClear, s2010DataSetClear]
+    #Mega Struct
+    #baseStemming{
+        # decade : {
+        #   musicName : [artist, quantidade de palavras, quantidade de palavras repetidas, quantidade de palavras unicas, [textMusic]]
+        # }
+    #  }
+    
+    dataFramesByStemmingData = []
 
-    listPathStemmingData = [s60DataSetStemming, s70DataSetStemming, s80DataSetStemming, s90DataSetStemming, s2000DataSetStemming, s2010DataSetStemming]
+    for path in listPathStemmingData:
+        df = readCSV(path)
+        dataFramesByStemmingData.append(df)
 
-    for path in listPathClearData:
-        df = pd.read_csv(path, sep = ';')
-        length = df.size
-        qtyPerDecade.append(length)
+    i = 0
+    for df in dataFramesByStemmingData:
+        baseStemming[decades[i]] = {}
+        musicNames = list(df['Music'])
+        for music in musicNames:
+            baseStemming[decades[i]][music] = []
+        i = i + 1
+    
+    print(baseStemming)
+        
+        
+
+    # qtyPerDecade = []
+
+    # for path in listPathClearData:
+    #     df = pd.read_csv(path, sep = ';')
+    #     length = df.size
+    #     qtyPerDecade.append(length)
 
     # generateGraphOfNumberOfSongsPerDecade(decades, qtyPerDecade)
 
