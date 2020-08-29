@@ -3,6 +3,9 @@ import matplotlib.pylab as plt
 import re
 import seaborn as sns
 
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+
 s60DataSetClear = 'data/clearData/musicReport-ClearData-60.csv'
 s60DataSetStemming = 'data/stemmingData/musicReport-StemmingData-60.csv'
 
@@ -98,8 +101,42 @@ def processingCSV(path):
     df = pd.read_csv(path, sep = ';')
 
 
+def musicRemoveSpecialCharacter(text):
 
-    return True
+    regex = re.compile(r'[-./?!,":;()```\']')
+    filtered = [i for i in text if not regex.match(i)]
+    return filtered
+
+
+def processingText(text):
+    
+    tokens = word_tokenize(text.values[0])
+
+    listClear = []
+
+    for token in tokens:
+        if(token != '[' and token != ']' and token != "'" and token != ","):
+            listClear.append(token.replace("'", ""))
+
+    return listClear
+
+def getQtdWords(text):
+    return len(text)
+
+def countWords(text):
+
+    wordUniques =[]
+    wordRepits = []
+
+    for word in text:
+        if(text.count(word) == 1):
+            wordUniques.append(word)
+        else:
+            wordRepits.append(word)
+
+    return (wordRepits, wordUniques)
+            
+
 
 def main():
 
@@ -114,19 +151,55 @@ def main():
     
     dataFramesByStemmingData = []
 
+    qtyWords = []
+    decade = []
+
     for path in listPathStemmingData:
         df = readCSV(path)
         dataFramesByStemmingData.append(df)
 
     i = 0
+    listWordsRepts = []
     for df in dataFramesByStemmingData:
         baseStemming[decades[i]] = {}
         musicNames = list(df['Music'])
-        for music in musicNames:
-            baseStemming[decades[i]][music] = []
+        totalRepit = 0
+        for name in musicNames:
+            data = []
+            musicData = df[df['Music'] == name]
+
+            artist = musicData['Artist'].values[0]
+
+            data.append(artist)
+
+            text = processingText(musicData['Text'])
+
+            totalWords = getQtdWords(text)
+
+            data.append(totalWords)
+
+            wordCount = countWords(text)
+
+            data.append(len(wordCount[0]))
+            data.append(len(wordCount[1]))
+
+            baseStemming[decades[i]][name] = data
+
+            decade.append(decades[i])
+            qtyWords.append(len(wordCount[0]))
+
+        listWordsRepts.append(totalRepit)
         i = i + 1
     
-    print(baseStemming)
+    data = {'decade': decade, 'len': qtyWords}
+
+    dfData = pd.DataFrame(data, columns=['decade', 'len'])
+    # dfData.to_csv("output.csv")
+    dfData.boxplot(column='len', by='decade', showfliers=False)
+    plt.xlabel("Década")
+    plt.ylabel("Quantidade de Palavras Repetidas")
+    plt.title("")
+    plt.show()
         
         
 
