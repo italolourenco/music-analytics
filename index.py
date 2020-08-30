@@ -5,6 +5,8 @@ import seaborn as sns
 
 from nltk.tokenize import sent_tokenize, word_tokenize
 
+from operator import itemgetter
+
 
 s60DataSetClear = 'data/clearData/musicReport-ClearData-60.csv'
 s60DataSetStemming = 'data/stemmingData/musicReport-StemmingData-60.csv'
@@ -151,6 +153,8 @@ def main():
     
     dataFramesByStemmingData = []
 
+    bd = []
+
     qtyWords = []
     decade = []
 
@@ -163,9 +167,10 @@ def main():
     for df in dataFramesByStemmingData:
         baseStemming[decades[i]] = {}
         musicNames = list(df['Music'])
-        totalRepit = 0
+        count = []
         for name in musicNames:
             data = []
+            data2 = []
             musicData = df[df['Music'] == name]
 
             artist = musicData['Artist'].values[0]
@@ -188,19 +193,46 @@ def main():
             decade.append(decades[i])
             qtyWords.append(len(wordCount[0]))
 
-        listWordsRepts.append(totalRepit)
+            data2.append(name)
+            data2.append(artist)
+            data2.append(len(wordCount[1]))
+
+            count.append(data2)
+        
+        bd.append(count)
+
+
+        # listWordsRepts.append(totalRepit)
         i = i + 1
     
-    data = {'decade': decade, 'len': qtyWords}
+    # data = {'decade': decade, 'len': qtyWords}
 
-    dfData = pd.DataFrame(data, columns=['decade', 'len'])
-    # dfData.to_csv("output.csv")
-    dfData.boxplot(column='len', by='decade', showfliers=False)
-    plt.xlabel("Década")
-    plt.ylabel("Quantidade de Palavras Repetidas")
-    plt.title("")
-    plt.show()
-        
+    # dfData = pd.DataFrame(data, columns=['decade', 'len'])
+    # # dfData.to_csv("output.csv")
+    # dfData.boxplot(column='len', by='decade', showfliers=False)
+    # plt.xlabel("Década")
+    # plt.ylabel("Quantidade de Palavras Repetidas")
+    # plt.title("")
+    # plt.show()
+
+
+    x = 0
+    for dataDecade in bd:
+        print(decades[x])
+        print(sorted(dataDecade, key=itemgetter(2)))
+        x = x + 1
+
+    # print(baseStemming)
+
+
+
+
+    # for decade in decades:
+    #     musics = baseStemming[decade]
+    #     newlist = sorted(ut, key=lambda x: musics, reverse=True)
+    #     print(musics)
+        # for music in musics:
+        #     print(baseStemming[decade][music])
         
 
     # qtyPerDecade = []
