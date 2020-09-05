@@ -2,6 +2,10 @@ import pandas as pd
 import matplotlib.pylab as plt
 import re
 import seaborn as sns
+import nltk
+import numpy as np
+
+
 
 from nltk.tokenize import sent_tokenize, word_tokenize
 
@@ -95,7 +99,12 @@ def generateBoxPlotQtyWordsStemmingData(decades, listPathStemmingData, qtyPerDec
     data = {'decade': decade, 'len': qtyWords}
 
     dfData = pd.DataFrame(data, columns=['decade', 'len'])
-    dfData.boxplot(column='len', by='decade', showfliers=False)
+    dfData.to_csv('output.csv')
+    # ax = sns.boxplot(x="decade", y="len", data=dfData, order=decades)
+    # ax = sns.swarmplot(x="decade", y="len", data=dfData, order=decades, color=".15")
+    # plt.xlabel("Década")
+    # plt.ylabel("Quantidade")
+    # plt.savefig('output/quantidadeDePalavrasPorMusicaSTEM.png', transparent = True)
     plt.show()
 
 
@@ -123,34 +132,28 @@ def processingText(text):
     return listClear
 
 def getQtdWords(text):
-    return len(text)
+    dist = nltk.FreqDist(text)
+
+    return len(dist.items())
 
 def countWords(text):
 
     wordUniques =[]
-    wordRepits = []
+    wordRepeated = []
 
-    for word in text:
-        if(text.count(word) == 1):
+    fdist = nltk.FreqDist(text)
+
+    for word, qtd in fdist.items():
+        if(qtd == 1):
             wordUniques.append(word)
         else:
-            wordRepits.append(word)
+            wordRepeated.append(word)
 
-    return (wordRepits, wordUniques)
+    return (wordRepeated, wordUniques)
             
-
-
-def main():
-
+def tableCap4():
     baseStemming = {}
-
-    #Mega Struct
-    #baseStemming{
-        # decade : {
-        #   musicName : [artist, quantidade de palavras, quantidade de palavras repetidas, quantidade de palavras unicas, [textMusic]]
-        # }
-    #  }
-    
+        
     dataFramesByStemmingData = []
 
     bd = []
@@ -163,7 +166,6 @@ def main():
         dataFramesByStemmingData.append(df)
 
     i = 0
-    listWordsRepts = []
     for df in dataFramesByStemmingData:
         baseStemming[decades[i]] = {}
         musicNames = list(df['Music'])
@@ -195,26 +197,23 @@ def main():
 
             data2.append(name)
             data2.append(artist)
-            data2.append(len(wordCount[1]))
+            data2.append(totalWords)
+            data2.append(len(text))
 
             count.append(data2)
         
         bd.append(count)
-
-
-        # listWordsRepts.append(totalRepit)
         i = i + 1
     
     # data = {'decade': decade, 'len': qtyWords}
 
     # dfData = pd.DataFrame(data, columns=['decade', 'len'])
-    # # dfData.to_csv("output.csv")
-    # dfData.boxplot(column='len', by='decade', showfliers=False)
-    # plt.xlabel("Década")
-    # plt.ylabel("Quantidade de Palavras Repetidas")
-    # plt.title("")
-    # plt.show()
 
+    # ax = sns.boxplot(x="decade", y="len", data=dfData, order=decades)
+    # plt.xlabel("Década")
+    # plt.ylabel("Quantidade")
+    # plt.savefig('output/quantidadeDePalavrasRepetidasPorMusicaSTEM.png', transparent = True)
+    # plt.show()
 
     x = 0
     for dataDecade in bd:
@@ -222,18 +221,82 @@ def main():
         print(sorted(dataDecade, key=itemgetter(2)))
         x = x + 1
 
+def plot_stacked_bar(data, series_labels, category_labels=None, 
+                     show_values=False, value_format="{}", y_label=None, 
+                     colors=None, grid=True, reverse=False):
+
+    ny = len(data[0])
+    ind = list(range(ny))
+
+    axes = []
+    cum_size = np.zeros(ny)
+
+    data = np.array(data)
+
+    print(data)
+
+    if reverse:
+        data = np.flip(data, axis=1)
+        category_labels = reversed(category_labels)
+
+    for i, row_data in enumerate(data):
+        color = colors[i] if colors is not None else None
+        axes.append(plt.bar(ind, row_data, bottom=cum_size, 
+                            label=series_labels[i], color=color))
+        cum_size += row_data
+
+    if category_labels:
+        plt.xticks(ind, category_labels)
+
+    if y_label:
+        plt.ylabel(y_label)
+
+    plt.legend()
+
+    if grid:
+        plt.grid(b=None)
+
+
+def generateGraphDataLoss():
+
+    series_labels = ['Salvo', 'Outro Idioma', 'Não Encontrado']
+
+    data = [
+    [59, 52, 62, 44, 55, 72],
+    [27, 34, 36, 47, 31, 17],
+    [14, 14, 2, 9, 14, 11]
+    ]
+
+    category_labels = ['60', '70', '80', '90', '2000', '2010']
+
+    plot_stacked_bar(
+        data, 
+        series_labels, 
+        category_labels=category_labels, 
+        show_values=True, 
+        value_format="{:.1f}",
+        colors=['tab:orange', 'tab:green', 'tab:blue'],
+        y_label="Quantity (units)"
+    )
+    plt.xlabel("Década")
+    plt.ylabel("Quantidade")
+    plt.savefig('output/loss.png', transparent = True)
+    plt.show()
+
+def main():
+
+
+    dataMusicStruct = {}
+
+    tableCap4()
+
+
+    # generateGraphDataLoss()
+
     # print(baseStemming)
 
 
-
-
-    # for decade in decades:
-    #     musics = baseStemming[decade]
-    #     newlist = sorted(ut, key=lambda x: musics, reverse=True)
-    #     print(musics)
-        # for music in musics:
-        #     print(baseStemming[decade][music])
-        
+    #Gerar Graficos 
 
     # qtyPerDecade = []
 
