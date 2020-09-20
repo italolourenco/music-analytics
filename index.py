@@ -4,6 +4,7 @@ import re
 import seaborn as sns
 import nltk
 import numpy as np
+import syllables
 
 
 
@@ -262,8 +263,8 @@ def generateGraphDataLoss():
     series_labels = ['Salvo', 'Outro Idioma', 'Não Encontrado']
 
     data = [
-    [59, 52, 62, 44, 55, 72],
-    [27, 34, 36, 47, 31, 17],
+    [58, 51, 62, 44, 54, 72],
+    [28, 35, 36, 47, 32, 17],
     [14, 14, 2, 9, 14, 11]
     ]
 
